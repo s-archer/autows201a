@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/schema/latest/base.schema.json",
+  "schemaVersion": "1.0.0",
+  "class": "Device",
+"async": true,
+  "Common": {
+    "class": "Tenant",
+      "myDns": {
+          "class": "DNS",
+          "nameServers": [
+            "8.8.8.8"
+          ],
+          "search": [
+              "f5.com",
+              "test.com"
+          ]
+      },
+      "myNtp": {
+          "class": "NTP",
+          "servers": [
+              "0.uk.pool.ntp.org"
+          ],
+          "timezone": "UTC"
+      },
+      "myProvisioning": {
+        "class": "Provision",
+        "ltm": "nominal"
+      },
+      "public": {
+          "class": "VLAN",
+          "tag": 1002,
+          "mtu": 1500,
+          "interfaces": [
+              {
+                  "name": "1.1",
+                  "tagged": false
+              }
+          ]
+      },
+      "public-self": {
+          "class": "SelfIp",
+          "address": "{{ ec2_eni_facts.network_interfaces[0].private_ip_addresses[0].private_ip_address }}/24",
+          "vlan": "public",
+          "allowService": "all",
+          "trafficGroup": "traffic-group-local-only"
+      },
+      "default": {
+          "class": "Route",
+          "gw": "{{ ec2_eni_facts.network_interfaces[0].private_ip_addresses[0].private_ip_address | ipsubnet(24) | ipaddr('next_usable') }}",
+          "network": "default",
+          "mtu": 1500
+      }
+   }
+}

@@ -1,0 +1,27 @@
+---
+#------------------------------------------------------------------------------
+# Variables used by both CREATE and DESTROY Playbooks. 
+#------------------------------------------------------------------------------
+#
+# *** Important - Do not put credentials in this file. ***  
+#
+#------------------------------------------------------------------------------
+
+# DEFINE UK SE NAME FOR USE IN TAGS
+uk_se_name: arch
+
+
+# DEFINE AWS REGION
+aws_region: eu-west-2
+
+
+# DEFINE SSH KEY (AS NAMED IN AWS) FOR AWS AMI BUILD
+sshKey: "arch_id_rsa"
+
+
+# DEFINE SSH KEY (LOCAL PATH) FOR AWS AMI BUILD
+ssh_key_file_path: "~/.ssh/id_rsa"
+
+
+#------------------------------------------------------------------------------
+...

@@ -1,0 +1,81 @@
+---
+#------------------------------------------------------------------------------
+# Start tasks
+#------------------------------------------------------------------------------
+
+
+# If not using terraform, you could use these next two blocks to install DO.
+#
+# Set Var for curent DO file name
+#  - name: RETRIEVE DO VERSION FROM FILE
+#    find:
+#      paths: ../files
+#      patterns: "f5-decl*.rpm"
+#    register: dorpm
+#    delegate_to: localhost
+
+
+#  - name: INSTALL DO
+#    bigip_lx_package:
+#      provider: "{{ provider }}"
+#      package: "{{ dorpm.files[0].path }}"
+#    delegate_to: localhost
+
+
+  - name: WAIT FOR DO API READY (MAX 1200)
+    uri:
+      url: "https://{{ inventory_hostname }}/mgmt/shared/declarative-onboarding/info"
+      method: GET
+      user: admin
+      #password: "{{ lookup('aws_secret', 'my_bigip_password') }}"
+      password: "{{ aws_secret }}"
+      status_code: 200
+      validate_certs: no
+    retries: 120
+    delay: 10
+    register: do_result
+    until: ('status' in do_result) and (do_result.status == 200)
+    changed_when: false
+
+
+  - name: DEPLOY DO BASE DECLARATION
+    uri:
+      url: "https://{{ inventory_hostname }}/mgmt/shared/declarative-onboarding"
+      method: POST
+      user: admin
+      password: "{{ aws_secret }}"
+      body: "{{ lookup('template', '../templates/do_base.j2', split_lines=False) }}"
+      status_code: 202
+      timeout: 300
+      body_format: json
+      validate_certs: no
+      return_content: yes
+    delegate_to: localhost
+    register: do_deploy
+
+
+  - name: DEBUG DO DEPLOY STATUS
+    debug:
+      msg: "{{ do_deploy.json.selfLink }}"
+
+
+  - name: DEPLOY DO DECLARATION STATUS (MAX 1200)
+    uri:
+      url: "{{ do_deploy.json.selfLink | replace ('localhost',inventory_hostname) }}"
+      method: GET
+      user: admin
+      password: "{{ aws_secret }}"
+      status_code: 200
+      validate_certs: no
+      return_content: yes
+    retries: 120
+    delay: 10
+    delegate_to: localhost
+    register: result
+    until: ('status' in result) and (result.status == 200)
+
+
+#------------------------------------------------------------------------------
+# End tasks
+#------------------------------------------------------------------------------
+...

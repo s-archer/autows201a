@@ -1,0 +1,20 @@
+---
+#------------------------------------------------------------------------------
+# Start tasks
+#------------------------------------------------------------------------------
+
+
+  - name: OUTPUT HTTPS LINK
+    debug:
+      msg: "You should now be able to login to the BIG-IP on https://{{ inventory_hostname }}"
+    
+
+  - name: OUTPUT HTTPS LINK
+    debug:
+      msg: "You should now be able to login to the APPLICATION on http://{{ eip2.results[1].public_ip }}"
+    
+
+#------------------------------------------------------------------------------
+# End tasks
+#------------------------------------------------------------------------------
+...

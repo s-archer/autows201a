@@ -1,3 +1,9 @@
+*.tfstate
+*.tfstate.backup
+*.retry
+*creds*
+*password*
+*/.terraform/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
