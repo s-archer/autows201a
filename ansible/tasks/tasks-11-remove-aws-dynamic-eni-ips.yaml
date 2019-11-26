@@ -1,0 +1,84 @@
+---
+#------------------------------------------------------------------------------
+# Start tasks
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# If we are using the dynamic inventory, we need to discover the ENI used for 'public' interface, 
+# and define the aws_pub_eni_id variable.
+#
+# If we are using the Static Inventory created by terraform, this section is skipped because
+# aws_pub_eni_id is already defined as a hostvar in the bigips.ini static inventory file.
+#
+#
+- name: OUTPUT EC2 INSTANCE NETWORK INTERFACE IDS FROM DYNAMIC INVENTORY
+  debug: 
+    msg: '{{ ec2_int_ids }}'
+
+
+  # Next four tasks should be done in two tasks, each with a loop, but bug means that in the combined 'results' is 
+  # only partially complete... the network_interfaces element for each result is empty {}.
+- name: GET ENI INFO FOR FIRST ENI
+  ec2_eni_facts:
+    filters:
+      network-interface-id: "{{ ec2_int_ids[0] }}"
+  register: eni_facts0
+
+
+- name: GET ENI INFO FOR SECOND ENI
+  ec2_eni_facts:
+    filters:
+      network-interface-id: "{{ ec2_int_ids[1] }}"
+  register: eni_facts1
+
+
+- name: SET FACT IF ENI IS PUBLIC
+  set_fact:
+    aws_pub_eni_id: "{{ eni_facts0.network_interfaces[0].network_interface_id }}"
+  when: eni_facts0.network_interfaces[0].groups[0].group_name=='public' and aws_pub_eni_id is undefined
+
+
+- name: SET FACT IF ENI IS PUBLIC
+  set_fact:
+    aws_pub_eni_id: "{{ eni_facts1.network_interfaces[0].network_interface_id }}"
+  when: eni_facts1.network_interfaces[0].groups[0].group_name=='public' and aws_pub_eni_id is undefined
+
+#------------------------------------------------------------------------------
+
+
+- name: GET ENI FACTS
+  ec2_eni_facts:
+    filters:
+      network-interface-id: "{{ aws_pub_eni_id }}"
+  register: ec2_eni_facts
+
+
+- name: DEBUG OUTPUT EXISTING PUBLIC IPS
+  debug:
+    msg: "Public IP {{ index }}: {{ item.association.public_ip }}"
+  loop: "{{ ec2_eni_facts.network_interfaces[0].private_ip_addresses }}"
+  loop_control:
+    index_var: index
+
+
+- name: DISASSOCIATE EIPS FROM ENI
+  ec2_eip:
+    public_ip: "{{ item.association.public_ip }}"
+    device_id: "{{ aws_pub_eni_id }}"
+    private_ip_address: "{{ item.private_ip_address }}"
+    in_vpc: true
+    state: absent
+    release_on_disassociation: yes
+  loop: "{{ ec2_eni_facts.network_interfaces[0].private_ip_addresses }}"
+  loop_control:
+    index_var: index
+
+
+- name: OUTPUT ADVICE
+  debug:
+    msg: "You should now be able to delete the inrastructure with terraform destroy"
+
+#------------------------------------------------------------------------------
+# End tasks
+#------------------------------------------------------------------------------
+...

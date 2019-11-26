@@ -83,6 +83,9 @@ resource "aws_security_group" "mgmt" {
     protocol        = "-1"
     cidr_blocks     = ["0.0.0.0/0"]
   }
+  tags = {
+    Name = "arch-mgmt"
+  }
 }
 
 
@@ -109,6 +112,9 @@ resource "aws_security_group" "public" {
     to_port         = 0
     protocol        = "-1"
     cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "arch-public"
   }
 }
 
@@ -159,7 +165,7 @@ module bigip {
   source = "f5devcentral/bigip/aws"
   version = "0.1.2"
 
-  prefix            = "bigip"
+  prefix            = "arch-bigip-"
   f5_instance_count = 1
   ec2_key_name      = var.sshkey
   aws_secretmanager_secret_id = "my_bigip_password"
@@ -205,7 +211,7 @@ output "public_nic_ids" {
 resource "local_file" "bigips_inventory" {
     content     = <<EOF
 [bigips]
-${module.bigip.mgmt_public_ips.0} aws_pub_eni_id=${module.bigip.public_nic_ids.0}
+${module.bigip.mgmt_public_ips.0} aws_pub_eni_id=${module.bigip.public_nic_ids.0} 
     EOF
-    filename = "../ansible/inventory/bigips.ini"
+    filename = "../ansible/inventory/static-bigips.ini"
 }

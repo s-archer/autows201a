@@ -1,0 +1,3 @@
+
+aws ec2 describe-images --region eu-west-2 --filters "Name=name,Values=*BIGIP-14.1.2*PAYG-Best*25*"| grep '\"Name\"\|\"ImageId\"'
+aws2 ec2 describe-images --region eu-west-2 --filters "Name=name,Values=[*BIGIP-14.1.2*PAYG-Best*25*]" | grep '\"Name\"\|\"ImageId\"'

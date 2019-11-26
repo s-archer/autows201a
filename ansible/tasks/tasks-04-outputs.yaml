@@ -4,15 +4,21 @@
 #------------------------------------------------------------------------------
 
 
-  - name: OUTPUT HTTPS LINK
-    debug:
-      msg: "You should now be able to login to the BIG-IP on https://{{ inventory_hostname }}"
-    
+- name: OUTPUT HTTPS LINK
+  debug:
+    msg: "You should now be able to login to the BIG-IP on https://{{ inventory_hostname }}"
+  
 
-  - name: OUTPUT HTTPS LINK
-    debug:
-      msg: "You should now be able to login to the APPLICATION on http://{{ eip2.results[1].public_ip }}"
-    
+- name: OUTPUT HTTPS LINK
+  debug:
+    msg: "You should now be able to login to the APPLICATION on http://{{ eip2.results[1].public_ip }}"
+
+
+- name: SEND NOTIFICATION TO SLACK
+  slack:
+    token: TQJGFGSVD/BR2D7AN06/2Bsc8hKCUlokflbqPDiKAzLP
+    msg: '[ARCH] You should now be able to login to the BIG-IP on https://{{ inventory_hostname }}\n\nYou should now be able to login to the APPLICATION on http://{{ eip2.results[1].public_ip }}'
+  delegate_to: localhost
 
 #------------------------------------------------------------------------------
 # End tasks

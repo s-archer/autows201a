@@ -1,11 +1,8 @@
 ---
 #------------------------------------------------------------------------------
-#  
-# Playbook for 201 Automation Workshop - Runs AFTER Terraform has built Infra.
+# Playbook to DELETE Ansible Components.
 #
-#------------------------------------------------------------------------------
-#   Terraform should create/populate the inventory file ../inventory/bigips.ini
-#   Run 'ansible-playbook ./main.yaml -i ../inventory/bigips.ini --ask-vault-pass'
+#   Requires pyvmomi python library
 #------------------------------------------------------------------------------
 
 - name: CONFIGURE DEPLOYED BIG-IP
@@ -24,7 +21,7 @@
 
   vars_files:
 
-    - ../../../creds/aws_creds_personal.yaml
+    - ../../../creds/aws_creds.yaml
     - ../vars/vars.yaml
 
   
@@ -38,10 +35,7 @@
 
   tasks:
 
-  - include_tasks: ../tasks/tasks-01-aws-eni-ips.yaml
-  - include_tasks: ../tasks/tasks-02-deploy-do.yaml
-  - include_tasks: ../tasks/tasks-03-deploy-as3.yaml
-  - include_tasks: ../tasks/tasks-04-outputs.yaml
+  - include_tasks: ../tasks/tasks-11-remove-aws-static-eni-ips.yaml
 
 #------------------------------------------------------------------------------
 # End tasks

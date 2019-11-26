@@ -3,6 +3,7 @@
 # Start tasks
 #------------------------------------------------------------------------------
 
+
 # Bug in Ansible 'aws_secret' module, so using AWS CLI command instead
 - name: GET PASSWORD FROM AWS SECRET STORE
   shell: "aws secretsmanager get-secret-value --secret-id my_bigip_password"
@@ -23,8 +24,51 @@
 - name: TEST AWS SECRET
   debug: 
     msg: "{{ aws_secret }}"
-    
-    
+
+#------------------------------------------------------------------------------
+# If we are using the dynamic inventory, we need to discover the ENI used for 'public' interface, 
+# and define the aws_pub_eni_id variable.
+#
+- name: OUTPUT EC2 INSTANCE NETWORK INTERFACE IDS FROM DYNAMIC INVENTORY
+  debug: 
+    msg: '{{ ec2_int_ids }}'
+
+
+  # Next four tasks should be done in two tasks, each with a loop, but bug means that in the combined 'results' is 
+  # only partially complete... the network_interfaces element for each result is empty {}.
+- name: GET ENI INFO FOR FIRST ENI
+  ec2_eni_facts:
+    filters:
+      network-interface-id: "{{ ec2_int_ids[0] }}"
+  register: eni_facts0
+
+
+- name: GET ENI INFO FOR SECOND ENI
+  ec2_eni_facts:
+    filters:
+      network-interface-id: "{{ ec2_int_ids[1] }}"
+  register: eni_facts1
+
+
+- name: SET FACT IF ENI IS PUBLIC
+  set_fact:
+    aws_pub_eni_id: "{{ eni_facts0.network_interfaces[0].network_interface_id }}"
+  when: eni_facts0.network_interfaces[0].groups[0].group_name=='public' and aws_pub_eni_id is undefined
+
+
+- name: SET FACT IF ENI IS PUBLIC
+  set_fact:
+    aws_pub_eni_id: "{{ eni_facts1.network_interfaces[0].network_interface_id }}"
+  when: eni_facts1.network_interfaces[0].groups[0].group_name=='public' and aws_pub_eni_id is undefined
+
+#------------------------------------------------------------------------------
+
+
+- name: OUTPUT EC2 INSTANCE NETWORK INTERFACES
+  debug: 
+    msg: "{{ aws_pub_eni_id }}"
+
+
 - name: UPDATE EXITSING PUBLIC ENI WITH SECONDARY IPS
   ec2_eni:
     eni_id: "{{ aws_pub_eni_id }}"

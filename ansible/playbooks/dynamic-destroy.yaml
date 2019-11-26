@@ -21,8 +21,7 @@
 
   vars_files:
 
-    - ../../../creds/aws_creds_personal.yaml
-    - ../../../creds/big_creds.yaml
+    - ../../../creds/aws_creds.yaml
     - ../vars/vars.yaml
 
   
@@ -36,7 +35,7 @@
 
   tasks:
 
-  - include_tasks: ../tasks/tasks-11-remove-aws-eni-ips.yaml
+  - include_tasks: ../tasks/tasks-11-remove-aws-dynamic-eni-ips.yaml
 
 #------------------------------------------------------------------------------
 # End tasks

@@ -1,0 +1,33 @@
+#------------------------------------------------------------------------------
+#  
+# This is an Ansible dynamic inventory file.
+# It uses credentials stored in ~/.aws/credentials to discover ec2 instances in AWS
+#
+# To test that it is working correctly use:
+#   ansible-inventory -i ./aws_ec2.yaml --graph
+#
+#  For example, my output looks like this (note one bigip discovered and allocated to
+#  the bigips group):
+#
+# @all:
+#   |--@aws_ec2:
+#   |  |--18.130.189.150
+#   |  |--18.130.144.76
+#   |  |--3.11.18.14
+#   |--@bigips:
+#   |  |--3.11.19.24
+#   |--@ungrouped:
+# 
+#------------------------------------------------------------------------------
+
+plugin: aws_ec2
+regions:
+  - eu-west-2
+hostnames:
+  - ip-address
+groups:
+  bigips: "'arch-bigip-' in tags.Name"
+compose:
+  # set the ansible_host variable to connect with the private IP address without changing the hostname
+  ec2_int_ids: 'network_interfaces | json_query("[*].network_interface_id")'
+

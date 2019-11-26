@@ -21,19 +21,21 @@
 #    delegate_to: localhost
 
 
-  - name: WAIT FOR AS3 API (204)
+  - name: WAIT FOR AS3 API (204 or 200 WHEN DECLARATION EXISTS)
     uri:
       url: "https://{{ inventory_hostname }}/mgmt/shared/appsvcs/declare"
       method: GET
       user: admin
       password: "{{ aws_secret }}"
       force_basic_auth: yes
-      status_code: 204 
+      status_code: 
+        - 200
+        - 204
       validate_certs: no
     retries: 30
     delay: 5
     register: as3_result
-    until: ('status' in as3_result) and (as3_result.status == 204)
+    until: ('status' in as3_result and (as3_result.status == 200 or as3_result.status == 204 ))
     changed_when: false
 
 
