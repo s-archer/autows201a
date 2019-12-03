@@ -5,7 +5,7 @@
 
 # If not using terraform, you could use these next two blocks to install AS3.
 #
-# Set Var for curent AS3 file name
+#Set Var for curent AS3 file name
 #  - name: RETRIEVE AS3 VERSION FROM FILE
 #    find:
 #      paths: ../files
@@ -14,9 +14,20 @@
 #    delegate_to: localhost
 
 
+#  - name: DEBUG FILE NAME
+#    debug:
+#      msg: "{{ as3rpm.files[0].path }}"
+
+
 #  - name: INSTALL AS3
 #    bigip_lx_package:
-#      provider: "{{ provider }}"
+#      provider:
+#        server: "{{ inventory_hostname }}"
+#        user: "admin"
+#        password: "{{ aws_secret }}"
+#        ssh_keyfile: "{{ ssh_key_file_path }}"
+#        validate_certs: no
+#        server_port: 443
 #      package: "{{ as3rpm.files[0].path }}"
 #    delegate_to: localhost
 

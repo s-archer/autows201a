@@ -28,33 +28,33 @@ resource "aws_vpc" "main" {
 
   tags = {
     Name = "arch-autows201-tf"
-    UKSE = var.uk_se_name
+    UK-SE = var.uk_se_name
   }
 }
 
 
 # CREATE SUBNET FOR MGMT
-resource "aws_subnet" "mgmt-a" {
+resource "aws_subnet" "mgmt" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.1.0/24"
   availability_zone = "eu-west-2a"
 
   tags = {
-    Name = "mgmt-a"
-    UKSE = var.uk_se_name
+    Name = "mgmt"
+    UK-SE = var.uk_se_name
   }
 }
 
 
 # CREATE SUBNET FOR PUBLIC
-resource "aws_subnet" "public-a" {
+resource "aws_subnet" "public" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.2.0/24"
   availability_zone = "eu-west-2a"
 
   tags = {
-    Name = "public-a"
-    UKSE = var.uk_se_name
+    Name = "public"
+    UK-SE = var.uk_se_name
   }
 }
 
@@ -85,6 +85,7 @@ resource "aws_security_group" "mgmt" {
   }
   tags = {
     Name = "arch-mgmt"
+    UK-SE = var.uk_se_name
   }
 }
 
@@ -115,6 +116,7 @@ resource "aws_security_group" "public" {
   }
   tags = {
     Name = "arch-public"
+    UK-SE = var.uk_se_name
   }
 }
 
@@ -147,15 +149,15 @@ resource "aws_route_table" "main-rt" {
 
 
 # ASSOCIATE ROUTE TABLE WITH MGMT SUBNET
-resource "aws_route_table_association" "mgmt-a" {
-  subnet_id      = "${aws_subnet.mgmt-a.id}"
+resource "aws_route_table_association" "mgmt" {
+  subnet_id      = "${aws_subnet.mgmt.id}"
   route_table_id = "${aws_route_table.main-rt.id}"
 }
 
 
 # ASSOCIATE ROUTE TABLE WITH PUBLIC SUBNET
-resource "aws_route_table_association" "public-a" {
-  subnet_id      = "${aws_subnet.public-a.id}"
+resource "aws_route_table_association" "public" {
+  subnet_id      = "${aws_subnet.public.id}"
   route_table_id = "${aws_route_table.main-rt.id}"
 }
 
@@ -171,15 +173,15 @@ module bigip {
   aws_secretmanager_secret_id = "my_bigip_password"
   mgmt_subnet_security_group_ids = [aws_security_group.mgmt.id]
   public_subnet_security_group_ids = [aws_security_group.public.id]
-  vpc_mgmt_subnet_ids = [aws_subnet.mgmt-a.id]
-  vpc_public_subnet_ids = [aws_subnet.public-a.id]
+  vpc_mgmt_subnet_ids = [aws_subnet.mgmt.id]
+  vpc_public_subnet_ids = [aws_subnet.public.id]
   # NEED TO ADD BELOW TO REPLACE DEFAULT IN MODULE
   f5_ami_search_name = "F5 Networks BIGIP-14.* PAYG - Best 25*"
 
 }
 
 
-# OUTOPUT MGMT PUBLIC IPS
+# OUTPUT MGMT PUBLIC IPS
 output "mgmt_public_ips" {
   description = "List of BIG-IP public IP addresses for the management interfaces"
   value       = module.bigip.mgmt_public_ips

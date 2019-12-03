@@ -4,7 +4,7 @@
 # It uses credentials stored in ~/.aws/credentials to discover ec2 instances in AWS
 #
 # To test that it is working correctly use:
-#   ansible-inventory -i ./aws_ec2.yaml --graph
+#   ansible-inventory -i ../inventory/dynamic-aws_ec2.yaml --graph
 #
 #  For example, my output looks like this (note one bigip discovered and allocated to
 #  the bigips group):

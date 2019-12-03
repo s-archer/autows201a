@@ -4,11 +4,11 @@
 # Playbook for 201 Automation Workshop - Runs AFTER Terraform has built Infra.
 #
 #------------------------------------------------------------------------------
-#   Terraform should create/populate the inventory file ../inventory/bigips.ini
-#   To use this 'static inventory':
-#     Run 'ansible-playbook ./main.yaml -i ../inventory/bigips.ini --ask-vault-pass'
+#   Terraform should create/populate the inventory file ../inventory/static-bigips.ini
+#   To use that 'static inventory':
+#     Run 'ansible-playbook ./static-main.yaml -i ../inventory/static-bigips.ini --ask-vault-pass'
 #   Or you can use the aws_ec2 'dynamic inventory' plugin, in which case:
-#     Run 'ansible-playbook ./main.yaml -i ../inventory/aws_ec2.yaml --ask-vault-pass'
+#     Run 'ansible-playbook ./dynamic-main.yaml -i ../inventory/dynamic-aws_ec2.yaml --ask-vault-pass'
 #------------------------------------------------------------------------------
 
 - name: CONFIGURE DEPLOYED BIG-IP
@@ -45,6 +45,7 @@
   - include_tasks: ../tasks/tasks-01-aws-dynamic-eni-ips.yaml
   - include_tasks: ../tasks/tasks-02-deploy-do.yaml
   - include_tasks: ../tasks/tasks-03-deploy-as3.yaml
+  - include_tasks: ../tasks/tasks-03b-deploy-ts.yaml
   - include_tasks: ../tasks/tasks-04-outputs.yaml
 
 #------------------------------------------------------------------------------
