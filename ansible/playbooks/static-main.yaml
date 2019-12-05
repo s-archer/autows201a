@@ -45,7 +45,6 @@
   - include_tasks: ../tasks/tasks-01-aws-static-eni-ips.yaml
   - include_tasks: ../tasks/tasks-02-deploy-do.yaml
   - include_tasks: ../tasks/tasks-03-deploy-as3.yaml
-  - include_tasks: ../tasks/tasks-03b-deploy-ts.yaml
   - include_tasks: ../tasks/tasks-04-outputs.yaml
 
 #------------------------------------------------------------------------------

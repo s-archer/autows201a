@@ -24,7 +24,7 @@ provider "aws" {
 # CREATE VPC IN AWS
 resource "aws_vpc" "main" {
   cidr_block       = "10.0.0.0/16"
-  instance_tenancy = "dedicated"
+  instance_tenancy = "shared"
 
   tags = {
     Name = "arch-autows201-tf"
