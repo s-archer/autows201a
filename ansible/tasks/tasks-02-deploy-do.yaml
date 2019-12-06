@@ -36,7 +36,7 @@
     register: do_result
     until: ('status' in do_result) and (do_result.status == 200)
     changed_when: false
-
+    
 
   - name: DEPLOY DO BASE DECLARATION
     uri:

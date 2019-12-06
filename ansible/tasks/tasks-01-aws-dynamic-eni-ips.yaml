@@ -16,7 +16,7 @@
     msg: "{{ aws_secret }}"
 
 
-- name: GET PASSWORD FROM STDOUT
+- name: SAVE PASSWORD AS FACT
   set_fact:
     aws_secret: "{{ aws_secret.stdout | from_json | json_query('SecretString')  }}"    
 
@@ -132,14 +132,6 @@
     filters:
       network-interface-id: "{{ aws_pub_eni_id }}"
   register: ec2_eni_facts
-
-
-- name: OUTPUT ALL PUBLIC AND PRIVATE IPS ASSOCIATED WITH THE ENI
-  debug:
-    msg: "Private IP {{ index }}: {{ item.private_ip_address }} -- Public IP: {{ item.association.public_ip }}"
-  loop: "{{ ec2_eni_facts.network_interfaces[0].private_ip_addresses }}"
-  loop_control:
-    index_var: index
 
 
 #------------------------------------------------------------------------------
